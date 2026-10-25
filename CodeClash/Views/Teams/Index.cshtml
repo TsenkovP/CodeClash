@@ -1,0 +1,47 @@
+@model IEnumerable<CodeClash.Models.Team>
+
+@{
+    ViewData["Title"] = "Списък с отбори";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Регистрирани отбори</h2>
+    <a asp-action="Create" class="btn btn-primary">
+        <i class="bi bi-plus-circle"></i> Нов отбор
+    </a>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-striped table-hover align-middle">
+        <thead class="table-dark">
+        <tr>
+            <th>Име на отбор</th>
+            <th>Ръководител</th>
+            <th>Имейл</th>
+            <th>Състезание</th>
+            <th>Дата на регистрация</th>
+            <th class="text-end">Действия</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var item in Model) {
+            <tr>
+                <td class="fw-bold">@item.TeamName</td>
+                <td>@item.MentorName</td>
+                <td>@item.ContactEmail</td>
+                <td>
+                    <span class="badge bg-info text-dark">
+                        @(item.Competition?.Title ?? "Няма избрано състезание")
+                    </span>
+                </td>
+                <td>@item.RegisteredOn.ToString("dd.MM.yyyy HH:mm")</td>
+                <td class="text-end">
+                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-info">Детайли</a>
+                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-warning">Редакция</a>
+                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-outline-danger">Изтриване</a>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>

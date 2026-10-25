@@ -1,0 +1,36 @@
+@model CodeClash.Models.Team
+
+@{
+    ViewData["Title"] = "Изтриване на отбор";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card border-danger shadow-sm">
+            <div class="card-header bg-danger text-white">
+                <h4 class="mb-0">Потвърждение за изтриване</h4>
+            </div>
+            <div class="card-body">
+                <p class="lead">Сигурни ли сте, че искате да премахнете този отбор?</p>
+                <dl class="row mb-4">
+                    <dt class="col-sm-4">Отбор:</dt>
+                    <dd class="col-sm-8 fw-bold">@Model.TeamName</dd>
+
+                    <dt class="col-sm-4">Ментор:</dt>
+                    <dd class="col-sm-8">@Model.MentorName</dd>
+
+                    <dt class="col-sm-4">Състезание:</dt>
+                    <dd class="col-sm-8">@(Model.Competition?.Title ?? "—")</dd>
+                </dl>
+
+                <form asp-action="Delete">
+                    <input type="hidden" asp-for="Id" />
+                    <div class="d-flex justify-content-between">
+                        <a asp-action="Index" class="btn btn-outline-secondary">Отказ</a>
+                        <button type="submit" class="btn btn-danger">Потвърди изтриването</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

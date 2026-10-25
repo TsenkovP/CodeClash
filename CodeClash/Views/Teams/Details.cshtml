@@ -1,0 +1,50 @@
+    @model CodeClash.Models.Team
+
+@{
+    ViewData["Title"] = "Детайли за отбор";
+}
+
+<div class="card shadow-sm">
+    <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+        <h4 class="mb-0">Отбор: @Model.TeamName</h4>
+        <span class="badge bg-light text-dark">Регистриран: @Model.RegisteredOn.ToString("dd.MM.yyyy")</span>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <h5>Информация за контакт</h5>
+                <p><strong>Ментор:</strong> @Model.MentorName</p>
+                <p><strong>Имейл:</strong> <a href="mailto:@Model.ContactEmail">@Model.ContactEmail</a></p>
+            </div>
+            <div class="col-md-6">
+                <h5>Състезание</h5>
+                <p><strong>Заглавие:</strong> @(Model.Competition?.Title ?? "Няма информация")</p>
+                <p><strong>Дата на събитието:</strong> @Model.Competition?.EventDate.ToString("dd.MM.yyyy")</p>
+            </div>
+        </div>
+
+        <hr />
+
+        <h5>Предаден проект (Submission)</h5>
+        @if (Model.Submission != null)
+        {
+            <div class="alert alert-success">
+                <p class="mb-1"><strong>Проект:</strong> @Model.Submission.ProjectTitle</p>
+                @if (!string.IsNullOrEmpty(Model.Submission.GitHubUrl))
+                {
+                    <p class="mb-1"><strong>GitHub:</strong> <a href="@Model.Submission.GitHubUrl" target="_blank">@Model.Submission.GitHubUrl</a></p>
+                }
+                <p class="mb-0"><strong>Оценка:</strong> @(Model.Submission.Score.HasValue ? $"{Model.Submission.Score}/100" : "Очаква оценяване")</p>
+            </div>
+        }
+        else
+        {
+            <p class="text-muted fst-italic">Все още няма предаден проект за този отбор.</p>
+        }
+
+        <div class="d-flex justify-content-between mt-4">
+            <a asp-action="Index" class="btn btn-outline-secondary">Обратно към списъка</a>
+            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Редактирай отбора</a>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,55 @@
+@model CodeClash.Models.Team
+
+@{
+    ViewData["Title"] = "Регистрация на нов отбор";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">Регистрация на отбор</h4>
+            </div>
+            <div class="card-body">
+                <form asp-action="Create">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                    <div class="mb-3">
+                        <label asp-for="TeamName" class="form-label">Име на отбора</label>
+                        <input asp-for="TeamName" class="form-control" placeholder="напр. AlphaRobots" />
+                        <span asp-validation-for="TeamName" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="MentorName" class="form-label">Ръководител / Ментор</label>
+                        <input asp-for="MentorName" class="form-control" />
+                        <span asp-validation-for="MentorName" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="ContactEmail" class="form-label">Имейл за връзка</label>
+                        <input asp-for="ContactEmail" class="form-control" type="email" />
+                        <span asp-validation-for="ContactEmail" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="CompetitionId" class="form-label">Състезание</label>
+                        <select asp-for="CompetitionId" class="form-select" asp-items="ViewBag.Competitions">
+                            <option value="">-- Изберете отворено състезание --</option>
+                        </select>
+                        <span asp-validation-for="CompetitionId" class="text-danger"></span>
+                    </div>
+
+                    <div class="d-flex justify-content-between mt-4">
+                        <a asp-action="Index" class="btn btn-outline-secondary">Отказ</a>
+                        <button type="submit" class="btn btn-primary">Запиши</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
