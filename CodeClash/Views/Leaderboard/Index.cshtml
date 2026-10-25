@@ -1,0 +1,109 @@
+@model CodeClash.Models.ViewModels.LeaderboardViewModel
+
+@{
+    ViewData["Title"] = "Класиране";
+}
+
+<div class="row align-items-center mb-4">
+    <div class="col-md-7">
+        <h2 class="fw-bold mb-1">Класиране на отборите</h2>
+        <p class="text-muted">Резултати и временно класиране по състезания</p>
+    </div>
+    <div class="col-md-5">
+        <form method="get" asp-action="Index" class="d-flex gap-2">
+            <select name="competitionId" class="form-select" onchange="this.form.submit()">
+                <option value="">-- Всички състезания --</option>
+                @foreach (var comp in Model.Competitions)
+                {
+                    <option value="@comp.Id" selected="@(comp.Id == Model.SelectedCompetitionId)">
+                        @comp.Title
+                    </option>
+                }
+            </select>
+            @if (Model.SelectedCompetitionId.HasValue)
+            {
+                <a asp-action="Index" class="btn btn-outline-secondary">Изчисти</a>
+            }
+        </form>
+    </div>
+</div>
+
+<div class="card shadow-sm border-0">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-dark">
+                <tr>
+                    <th class="text-center" style="width: 80px;">Място</th>
+                    <th>Отбор</th>
+                    <th>Ръководител</th>
+                    <th>Състезание</th>
+                    <th>Проект</th>
+                    <th class="text-center">Точки</th>
+                </tr>
+            </thead>
+            <tbody>
+            @if (!Model.RankedTeams.Any())
+            {
+                <tr>
+                    <td colspan="6" class="text-center py-5 text-muted">
+                        Няма намерени отбори за избрания критерий.
+                    </td>
+                </tr>
+            }
+            else
+            {
+                @foreach (var item in Model.RankedTeams)
+                {
+                    <tr class="@(item.Rank == 1 && item.Score.HasValue ? "table-warning fw-bold" : "")">
+                        <td class="text-center">
+                            @if (item.Rank == 1 && item.Score.HasValue)
+                            {
+                                <span class="badge bg-warning text-dark fs-6">🥇 1</span>
+                            }
+                            else if (item.Rank == 2 && item.Score.HasValue)
+                            {
+                                <span class="badge bg-secondary text-white fs-6">🥈 2</span>
+                            }
+                            else if (item.Rank == 3 && item.Score.HasValue)
+                            {
+                                <span class="badge bg-danger text-white fs-6">🥉 3</span>
+                            }
+                            else
+                            {
+                                <span class="text-muted fw-bold">#@item.Rank</span>
+                            }
+                        </td>
+                        <td class="fw-semibold">@item.TeamName</td>
+                        <td>@item.MentorName</td>
+                        <td><span class="badge bg-light text-dark border">@item.CompetitionTitle</span></td>
+                        <td>
+                            @if (!string.IsNullOrEmpty(item.ProjectTitle))
+                            {
+                                <div>@item.ProjectTitle</div>
+                                @if (!string.IsNullOrEmpty(item.GitHubUrl))
+                                {
+                                    <small><a href="@item.GitHubUrl" target="_blank" class="text-decoration-none">GitHub код &rarr;</a></small>
+                                }
+                            }
+                            else
+                            {
+                                <span class="text-muted small">Не е предаден проект</span>
+                            }
+                        </td>
+                        <td class="text-center">
+                            @if (item.Score.HasValue)
+                            {
+                                <span class="badge bg-success fs-6 px-3 py-2">@item.Score т.</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-light text-muted border">Неоценен</span>
+                            }
+                        </td>
+                    </tr>
+                }
+            }
+            </tbody>
+        </table>
+    </div>
+</div>
