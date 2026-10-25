@@ -1,0 +1,49 @@
+@model CodeClash.Models.ProjectSubmission
+
+@{
+    ViewData["Title"] = "Предаване на проект";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">Форма за предаване на проект</h4>
+            </div>
+            <div class="card-body">
+                <form asp-action="Create">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                    <div class="mb-3">
+                        <label asp-for="TeamId" class="form-label">Изберете отбор</label>
+                        <select asp-for="TeamId" class="form-select" asp-items="ViewBag.Teams">
+                            <option value="">-- Изберете отбор --</option>
+                        </select>
+                        <span asp-validation-for="TeamId" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="ProjectTitle" class="form-label">Заглавие на разработката</label>
+                        <input asp-for="ProjectTitle" class="form-control" placeholder="напр. Автономна метеостанция с IoT" />
+                        <span asp-validation-for="ProjectTitle" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="GitHubUrl" class="form-label">Линк към хранилище (GitHub)</label>
+                        <input asp-for="GitHubUrl" class="form-control" placeholder="https://github.com/..." />
+                        <span asp-validation-for="GitHubUrl" class="text-danger"></span>
+                    </div>
+
+                    <div class="d-flex justify-content-between mt-4">
+                        <a asp-action="Index" class="btn btn-outline-secondary">Отказ</a>
+                        <button type="submit" class="btn btn-primary">Предай проекта</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

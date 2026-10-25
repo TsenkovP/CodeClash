@@ -1,0 +1,75 @@
+@model IEnumerable<CodeClash.Models.ProjectSubmission>
+
+@{
+    ViewData["Title"] = "Предадени проекти";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Предадени проекти за състезанията</h2>
+    <a asp-action="Create" class="btn btn-primary">Предай нов проект</a>
+</div>
+
+<div class="table-responsive shadow-sm rounded">
+    <table class="table table-hover table-striped align-middle mb-0">
+        <thead class="table-dark">
+            <tr>
+                <th>Проект</th>
+                <th>Отбор</th>
+                <th>Състезание</th>
+                <th>GitHub хранилище</th>
+                <th>Предаден на</th>
+                <th>Точки</th>
+                <th class="text-center">Действия</th>
+            </tr>
+        </thead>
+        <tbody>
+        @if (!Model.Any())
+        {
+            <tr>
+                <td colspan="7" class="text-center py-4 text-muted">
+                    Все още няма предадени проекти.
+                </td>
+            </tr>
+        }
+        else
+        {
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td class="fw-bold">@item.ProjectTitle</td>
+                    <td>@item.Team?.TeamName</td>
+                    <td>@(item.Team?.Competition?.Title ?? "—")</td>
+                    <td>
+                        @if (!string.IsNullOrEmpty(item.GitHubUrl))
+                        {
+                            <a href="@item.GitHubUrl" target="_blank" class="btn btn-sm btn-outline-secondary">
+                                Преглед в GitHub
+                            </a>
+                        }
+                        else
+                        {
+                            <span class="text-muted">—</span>
+                        }
+                    </td>
+                    <td>@item.SubmittedOn.ToString("dd.MM.yyyy HH:mm")</td>
+                    <td>
+                        @if (item.Score.HasValue)
+                        {
+                            <span class="badge bg-success fs-6">@item.Score / 100</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary">Неоценен</span>
+                        }
+                    </td>
+                    <td class="text-center">
+                        <a asp-action="Score" asp-route-id="@item.Id" class="btn btn-sm btn-outline-warning">
+                            Оцени
+                        </a>
+                    </td>
+                </tr>
+            }
+        }
+        </tbody>
+    </table>
+</div>

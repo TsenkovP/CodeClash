@@ -1,6 +1,8 @@
 namespace CodeClash.Models;
+
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+
 public class ProjectSubmission
 {
     [Key]
@@ -12,6 +14,8 @@ public class ProjectSubmission
 
     [Url]
     public string? GitHubUrl { get; set; }
+
+    public DateTime SubmittedOn { get; set; } = DateTime.UtcNow;
 
     [Range(0, 100)]
     public int? Score { get; set; }
