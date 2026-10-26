@@ -1,8 +1,167 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@model CodeClash.Models.ViewModels.HomeDashboardViewModel
+
+@{
+    ViewData["Title"] = "Начално табло";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<!-- Hero банер -->
+<div class="p-5 mb-4 bg-light rounded-4 shadow-sm border border-light-subtle">
+    <div class="container-fluid py-2">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-2 rounded-pill fw-semibold mb-3">
+                    Платформа за програмиране и хакатони
+                </span>
+                <h1 class="display-5 fw-bold text-dark tracking-tight">Добре дошли в CodeClash</h1>
+                <p class="col-md-10 fs-5 text-secondary">
+                    Централизирана система за организиране на олимпиади, състезания по програмиране и хакатони. Регистрация на отбори, качване на проекти и оценяване в реално време.
+                </p>
+                <div class="d-flex flex-wrap gap-2 mt-4">
+                    <a asp-controller="Competitions" asp-action="Index" class="btn btn-primary px-4 py-2 rounded-3 fw-semibold shadow-sm">
+                        Преглед на състезанията
+                    </a>
+                    <a asp-controller="Leaderboard" asp-action="Index" class="btn btn-outline-dark px-4 py-2 rounded-3 fw-semibold">
+                        Класиране
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-4 text-center d-none d-lg-block">
+                <div class="display-1 text-primary opacity-25 fw-bold">#CC</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Обобщени метрики (KPI карти в рамки) -->
+<div class="row g-3 mb-5">
+    <div class="col-sm-6 col-xl-3">
+        <div class="border rounded-4 p-4 bg-white shadow-sm h-100">
+            <span class="d-block text-secondary small fw-semibold text-uppercase" style="font-size: 0.75rem; letter-spacing: 0.5px;">Активни състезания</span>
+            <div class="fs-2 fw-bold text-dark mt-2">@Model.ActiveCompetitionsCount</div>
+            <small class="text-muted">отворени за регистрация</small>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="border rounded-4 p-4 bg-white shadow-sm h-100">
+            <span class="d-block text-secondary small fw-semibold text-uppercase" style="font-size: 0.75rem; letter-spacing: 0.5px;">Записани отбори</span>
+            <div class="fs-2 fw-bold text-primary mt-2">@Model.TotalTeamsCount</div>
+            <small class="text-muted">всички участници</small>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="border rounded-4 p-4 bg-white shadow-sm h-100">
+            <span class="d-block text-secondary small fw-semibold text-uppercase" style="font-size: 0.75rem; letter-spacing: 0.5px;">Предадени проекти</span>
+            <div class="fs-2 fw-bold text-success mt-2">@Model.SubmissionsCount</div>
+            <small class="text-muted">с код в GitHub</small>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="border rounded-4 p-4 bg-white shadow-sm h-100">
+            <span class="d-block text-secondary small fw-semibold text-uppercase" style="font-size: 0.75rem; letter-spacing: 0.5px;">Средна оценка</span>
+            <div class="fs-2 fw-bold text-warning mt-2">
+                @(Model.AverageScore > 0 ? $"{Model.AverageScore} т." : "—")
+            </div>
+            <small class="text-muted">от журито (до 100)</small>
+        </div>
+    </div>
+</div>
+
+<!-- Долна секция: Предстоящо събитие + Топ проекти -->
+<div class="row g-4">
+    <!-- Лява колона: Предстоящо събитие -->
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm rounded-4 h-100">
+            <div class="card-header bg-white border-bottom p-4">
+                <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-3 py-1 fw-semibold small">
+                    Следващо предстоящо събитие
+                </span>
+                <h4 class="fw-bold text-dark mt-2 mb-0">Предстоящ хакатон</h4>
+            </div>
+            <div class="card-body p-4 d-flex flex-column justify-content-between">
+                @if (Model.NextUpcomingCompetition != null)
+                {
+                    <div>
+                        <h4 class="fw-bold text-primary mb-2">@Model.NextUpcomingCompetition.Title</h4>
+                        <p class="text-secondary mb-4">
+                            @(string.IsNullOrWhiteSpace(Model.NextUpcomingCompetition.Description) 
+                                ? "Регистрацията за събитието е отворена. Побързайте да запишете своя отбор!" 
+                                : Model.NextUpcomingCompetition.Description)
+                        </p>
+
+                        <div class="row g-2 mb-4">
+                            <div class="col-6">
+                                <div class="border rounded-3 p-3 bg-light text-center">
+                                    <span class="d-block text-secondary small text-uppercase" style="font-size: 0.72rem;">Дата</span>
+                                    <span class="fw-bold text-dark">@Model.NextUpcomingCompetition.EventDate.ToString("dd.MM.yyyy")</span>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="border rounded-3 p-3 bg-light text-center">
+                                    <span class="d-block text-secondary small text-uppercase" style="font-size: 0.72rem;">Записани отбори</span>
+                                    <span class="fw-bold text-dark">@(Model.NextUpcomingCompetition.Teams?.Count ?? 0)</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <a asp-controller="Teams" asp-action="Create" asp-route-competitionId="@Model.NextUpcomingCompetition.Id" class="btn btn-success w-100 py-2 fw-semibold rounded-3 shadow-sm">
+                            + Запиши отбор за това състезание
+                        </a>
+                    </div>
+                }
+                else
+                {
+                    <div class="text-center py-5 text-muted">
+                        <p class="mb-3">В момента няма предстоящи състезания с активна регистрация.</p>
+                        <a asp-controller="Competitions" asp-action="Create" class="btn btn-outline-primary btn-sm">
+                            + Създай ново състезание
+                        </a>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- Дясна колона: Лидери в класирането -->
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm rounded-4 h-100">
+            <div class="card-header bg-white border-bottom p-4 d-flex justify-content-between align-items-center">
+                <h4 class="fw-bold text-dark mb-0">Топ проекти</h4>
+                <a asp-controller="Leaderboard" asp-action="Index" class="btn btn-sm btn-outline-secondary">
+                    Пълно класиране &rarr;
+                </a>
+            </div>
+            <div class="card-body p-4">
+                @if (!Model.TopProjects.Any())
+                {
+                    <div class="text-center py-5 text-muted">
+                        Все още няма оценени проекти за класирането.
+                    </div>
+                }
+                else
+                {
+                    <div class="d-flex flex-column gap-3">
+                        @foreach (var top in Model.TopProjects)
+                        {
+                            <div class="border rounded-3 p-3 bg-light d-flex justify-content-between align-items-center">
+                                <div>
+                                    <div class="fw-bold text-dark">
+                                        @if (top.Rank == 1) { <span>🥇</span> }
+                                        else if (top.Rank == 2) { <span>🥈</span> }
+                                        else if (top.Rank == 3) { <span>🥉</span> }
+                                        @top.TeamName
+                                    </div>
+                                    <small class="text-muted d-block">@top.ProjectTitle (@top.CompetitionTitle)</small>
+                                </div>
+                                <div>
+                                    <span class="badge bg-success px-3 py-2 fs-6">@top.Score т.</span>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
 </div>
