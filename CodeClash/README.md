@@ -78,12 +78,12 @@ cd CodeClash
 
 
 2. **Настройка на връзката с базата данни:**
-   Отворете файла `CodeClash/appsettings.json` и коригирайте connection string-а според вашите SQL Server настройки:
-```json
-"ConnectionStrings": {
-  "DefaultConnection": "Server=localhost;Database=CodeClashDb;User Id=sa;Password=YourStrongPassword!;TrustServerCertificate=True;"
-}
 
+### Настройка на базата данни (appsettings.json)
+
+По подразбиране проектът е настроен за локален **SQL Server / LocalDB**:
+```json
+"DefaultConnection": "Server=(localdb)\\mssqllocaldb;Database=CodeClashDb;Trusted_Connection=True;MultipleActiveResultSets=true;TrustServerCertificate=True;"
 ```
 
 

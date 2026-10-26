@@ -27,5 +27,21 @@ app.UseAuthorization();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+// Автоматично създаване на базата данни и таблиците при стартиране на чиста машина
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    try
+    {
+        var context = services.GetRequiredService<ApplicationDbContext>();
+        // Създава базата данни и таблиците автоматично според текущите C# модели, ако не съществуват
+        context.Database.EnsureCreated();
+    }
+    catch (Exception ex)
+    {
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "Възникна грешка при автоматичното инициализиране на базата данни.");
+    }
+}
 
 app.Run();
