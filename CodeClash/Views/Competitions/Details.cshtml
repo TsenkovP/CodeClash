@@ -2,75 +2,128 @@
 
 @{
     ViewData["Title"] = "Детайли за състезанието";
+    bool canRegister = Model.IsOpenForRegistration && Model.EventDate.Date >= DateTime.UtcNow.Date;
 }
 
-<div class="card shadow-sm border-0 mb-4">
-    <div class="card-body">
-        <div class="d-flex justify-content-between align-items-start">
+<div class="card shadow-sm border-0 rounded-4 mb-4">
+    <div class="card-body p-4">
+        <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-3">
             <div>
-                <h2 class="fw-bold mb-1">@Model.Title</h2>
-                <span class="badge @(Model.IsOpenForRegistration ? "bg-success" : "bg-secondary") mb-3">
-                    @(Model.IsOpenForRegistration ? "Отворено за регистрация" : "Затворено")
-                </span>
+                <div class="mb-2">
+                    <span class="badge rounded-pill px-3 py-2 @(canRegister ? "bg-success-subtle text-success border border-success-subtle" : "bg-secondary-subtle text-secondary border border-secondary-subtle")">
+                        @(canRegister ? "Отворено за регистрация" : "Регистрацията е приключила")
+                    </span>
+                    <span class="text-muted ms-2 small">ID: #@Model.Id</span>
+                </div>
+                <h2 class="fw-bold text-dark mb-1">@Model.Title</h2>
             </div>
-            <div>
-                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-sm btn-outline-secondary">Редактирай</a>
-                <a asp-action="Index" class="btn btn-sm btn-outline-dark">Назад</a>
+            <div class="d-flex gap-2">
+                @if (canRegister)
+                {
+                    <a asp-controller="Teams" asp-action="Create" asp-route-competitionId="@Model.Id" class="btn btn-success px-3 fw-semibold shadow-sm">
+                        + Запиши отбор
+                    </a>
+                }
+                else
+                {
+                    <button class="btn btn-secondary px-3" disabled>Записването е затворено</button>
+                }
+                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-outline-secondary">Редакция</a>
+                <a asp-action="Index" class="btn btn-light border">Към всички</a>
             </div>
         </div>
-        <p class="lead">@Model.Description</p>
-        <div class="text-muted small">
-            <span>📅 <strong>Дата:</strong> @Model.EventDate.ToString("dd.MM.yyyy")</span> | 
-            <span>👥 <strong>Макс. състезатели в отбор:</strong> @Model.MaxTeamMembers</span>
+
+        <p class="text-secondary lead fs-6 mb-4">
+            @(string.IsNullOrWhiteSpace(Model.Description) ? "Няма въведено допълнително описание за регламента." : Model.Description)
+        </p>
+
+        <!-- Категории в рамки (Frames) -->
+        <div class="row g-3">
+            <div class="col-sm-4">
+                <div class="border rounded-3 p-3 bg-body-tertiary text-center">
+                    <span class="d-block text-secondary small fw-semibold text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.5px;">Дата на провеждане</span>
+                    <span class="fw-bold fs-5 text-dark">@Model.EventDate.ToString("dd.MM.yyyy")</span>
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="border rounded-3 p-3 bg-body-tertiary text-center">
+                    <span class="d-block text-secondary small fw-semibold text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.5px;">Макс. състезатели</span>
+                    <span class="fw-bold fs-5 text-dark">до @Model.MaxTeamMembers души</span>
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="border rounded-3 p-3 bg-body-tertiary text-center">
+                    <span class="d-block text-secondary small fw-semibold text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.5px;">Регистрирани отбори</span>
+                    <span class="fw-bold fs-5 text-dark">@(Model.Teams?.Count ?? 0)</span>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
-<h4 class="fw-bold mb-3">Записани отбори (@(Model.Teams?.Count ?? 0))</h4>
-<div class="card shadow-sm border-0">
-    <table class="table table-hover align-middle mb-0">
-        <thead class="table-light">
-            <tr>
-                <th>Отбор</th>
-                <th>Ръководител</th>
-                <th>Имейл за контакт</th>
-                <th>Проект</th>
-                <th>Оценка</th>
-            </tr>
-        </thead>
-        <tbody>
-        @if (Model.Teams == null || !Model.Teams.Any())
-        {
-            <tr>
-                <td colspan="5" class="text-center py-4 text-muted">
-                    Все още няма записани отбори за това състезание.
-                </td>
-            </tr>
-        }
-        else
-        {
-            @foreach (var team in Model.Teams)
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h4 class="fw-bold text-dark mb-0">Записани отбори за това състезание</h4>
+    @if (canRegister)
+    {
+        <a asp-controller="Teams" asp-action="Create" asp-route-competitionId="@Model.Id" class="btn btn-sm btn-outline-success">
+            + Нов отбор
+        </a>
+    }
+</div>
+
+<div class="card shadow-sm border-0 rounded-4 overflow-hidden">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-dark">
+                <tr>
+                    <th>Отбор</th>
+                    <th>Ръководител</th>
+                    <th>Имейл за връзка</th>
+                    <th>Предаден проект</th>
+                    <th class="text-center">Оценка</th>
+                </tr>
+            </thead>
+            <tbody>
+            @if (Model.Teams == null || !Model.Teams.Any())
             {
                 <tr>
-                    <td class="fw-bold">@team.TeamName</td>
-                    <td>@team.MentorName</td>
-                    <td>@team.ContactEmail</td>
-                    <td>
-                        @(team.Submission?.ProjectTitle ?? "—")
-                    </td>
-                    <td>
-                        @if (team.Submission?.Score.HasValue == true)
-                        {
-                            <span class="badge bg-success">@team.Submission.Score т.</span>
-                        }
-                        else
-                        {
-                            <span class="badge bg-light text-muted border">Няма</span>
-                        }
+                    <td colspan="5" class="text-center py-5 text-muted">
+                        Все още няма записани отбори за това състезание.
                     </td>
                 </tr>
             }
-        }
-        </tbody>
-    </table>
+            else
+            {
+                @foreach (var team in Model.Teams)
+                {
+                    <tr>
+                        <td class="fw-bold text-dark">@team.TeamName</td>
+                        <td>@team.MentorName</td>
+                        <td><a href="mailto:@team.ContactEmail" class="text-decoration-none">@team.ContactEmail</a></td>
+                        <td>
+                            @if (team.Submission != null)
+                            {
+                                <span class="fw-medium text-dark">@team.Submission.ProjectTitle</span>
+                            }
+                            else
+                            {
+                                <span class="text-muted small">Очаква се разработка</span>
+                            }
+                        </td>
+                        <td class="text-center">
+                            @if (team.Submission?.Score.HasValue == true)
+                            {
+                                <span class="badge bg-success fs-6 px-3">@team.Submission.Score т.</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-light text-muted border">Няма</span>
+                            }
+                        </td>
+                    </tr>
+                }
+            }
+            </tbody>
+        </table>
+    </div>
 </div>

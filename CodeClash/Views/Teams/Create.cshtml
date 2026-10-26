@@ -1,48 +1,73 @@
 @model CodeClash.Models.Team
 
 @{
-    ViewData["Title"] = "Регистрация на нов отбор";
+    ViewData["Title"] = "Регистрация на отбор";
+    var preselectedComp = ViewBag.PreselectedCompetition as CodeClash.Models.Competition;
 }
 
 <div class="row justify-content-center">
     <div class="col-md-6">
-        <div class="card shadow-sm">
-            <div class="card-header bg-primary text-white">
-                <h4 class="mb-0">Регистрация на отбор</h4>
+        <div class="card shadow-sm border-0 rounded-4">
+            <div class="card-header bg-primary text-white p-3 rounded-top-4">
+                <h4 class="mb-0 fw-bold">Регистрация на отбор</h4>
             </div>
-            <div class="card-body">
+            <div class="card-body p-4">
+
+                @if (preselectedComp != null)
+                {
+                    <div class="alert alert-info border-0 rounded-3 mb-4">
+                        <small class="text-uppercase fw-bold d-block text-secondary">Състезание:</small>
+                        <h5 class="fw-bold mb-1 text-dark">@preselectedComp.Title</h5>
+                        <small class="text-muted">Дата на провеждане: @preselectedComp.EventDate.ToString("dd.MM.yyyy") г.</small>
+                    </div>
+                }
+
                 <form asp-action="Create">
                     <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
+                    @if (preselectedComp != null)
+                    {
+                        <input type="hidden" asp-for="CompetitionId" value="@preselectedComp.Id" />
+                    }
+                    else
+                    {
+                        <div class="mb-3">
+                            <label asp-for="CompetitionId" class="form-label fw-semibold">Изберете състезание</label>
+                            <select asp-for="CompetitionId" class="form-select" asp-items="ViewBag.CompetitionId">
+                                <option value="">-- Изберете състезание --</option>
+                            </select>
+                            <span asp-validation-for="CompetitionId" class="text-danger"></span>
+                        </div>
+                    }
+
                     <div class="mb-3">
-                        <label asp-for="TeamName" class="form-label">Име на отбора</label>
-                        <input asp-for="TeamName" class="form-control" placeholder="напр. AlphaRobots" />
+                        <label asp-for="TeamName" class="form-label fw-semibold">Име на отбора</label>
+                        <input asp-for="TeamName" class="form-control" placeholder="напр. Binary Masters" />
                         <span asp-validation-for="TeamName" class="text-danger"></span>
                     </div>
 
                     <div class="mb-3">
-                        <label asp-for="MentorName" class="form-label">Ръководител / Ментор</label>
-                        <input asp-for="MentorName" class="form-control" />
+                        <label asp-for="MentorName" class="form-label fw-semibold">Ръководител / Ментор</label>
+                        <input asp-for="MentorName" class="form-control" placeholder="Три имена на ръководителя" />
                         <span asp-validation-for="MentorName" class="text-danger"></span>
                     </div>
 
                     <div class="mb-3">
-                        <label asp-for="ContactEmail" class="form-label">Имейл за връзка</label>
-                        <input asp-for="ContactEmail" class="form-control" type="email" />
+                        <label asp-for="ContactEmail" class="form-label fw-semibold">Имейл за връзка</label>
+                        <input asp-for="ContactEmail" type="email" class="form-control" placeholder="name@domain.com" />
                         <span asp-validation-for="ContactEmail" class="text-danger"></span>
                     </div>
 
-                    <div class="mb-3">
-                        <label asp-for="CompetitionId" class="form-label">Състезание</label>
-                        <select asp-for="CompetitionId" class="form-select" asp-items="ViewBag.Competitions">
-                            <option value="">-- Изберете отворено състезание --</option>
-                        </select>
-                        <span asp-validation-for="CompetitionId" class="text-danger"></span>
-                    </div>
-
-                    <div class="d-flex justify-content-between mt-4">
-                        <a asp-action="Index" class="btn btn-outline-secondary">Отказ</a>
-                        <button type="submit" class="btn btn-primary">Запиши</button>
+                    <div class="d-flex justify-content-between pt-3 border-top mt-4">
+                        @if (preselectedComp != null)
+                        {
+                            <a asp-controller="Competitions" asp-action="Details" asp-route-id="@preselectedComp.Id" class="btn btn-outline-secondary">Отказ</a>
+                        }
+                        else
+                        {
+                            <a asp-action="Index" class="btn btn-outline-secondary">Отказ</a>
+                        }
+                        <button type="submit" class="btn btn-primary px-4 fw-semibold">Регистрирай отбора</button>
                     </div>
                 </form>
             </div>

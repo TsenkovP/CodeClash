@@ -46,20 +46,41 @@ public class TeamsController : Controller
         return View(team);
     }
 
-    public async Task<IActionResult> Create()
+    // GET: Teams/Create или Teams/Create?competitionId=2
+    public async Task<IActionResult> Create(int? competitionId)
     {
-        ViewBag.Competitions = new SelectList(
-            await _context.Competitions.Where(c => c.IsOpenForRegistration).ToListAsync(),
-            "Id",
-            "Title"
-        );
+        // Зареждаме само състезания, които са отворени за записване
+        var openCompetitions = await _context.Competitions
+            .Where(c => c.IsOpenForRegistration && c.EventDate >= DateTime.UtcNow.Date)
+            .AsNoTracking()
+            .ToListAsync();
+
+        // Ако идваме от конкретно състезание, проверяваме дали то съществува и е отворено
+        if (competitionId.HasValue)
+        {
+            var targetCompetition = await _context.Competitions.FindAsync(competitionId.Value);
+            if (targetCompetition != null && targetCompetition.IsOpenForRegistration)
+            {
+                ViewBag.PreselectedCompetition = targetCompetition;
+                ViewBag.CompetitionId = new SelectList(openCompetitions, "Id", "Title", competitionId.Value);
+                return View(new Team { CompetitionId = competitionId.Value });
+            }
+        }
+
+        ViewBag.CompetitionId = new SelectList(openCompetitions, "Id", "Title");
         return View();
     }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create([Bind("TeamName,MentorName,ContactEmail,CompetitionId")] Team team)
+    public async Task<IActionResult> Create([Bind("TeamName,MentorName,ContactEmail,CompetitionId,MaxTeamMembers")] Team team)
     {
+        var competition = await _context.Competitions.FindAsync(team.CompetitionId);
+        if (competition == null || !competition.IsOpenForRegistration)
+        {
+            ModelState.AddModelError("CompetitionId", "Регистрацията за това състезание е затворена или не съществува.");
+        }
+
         if (ModelState.IsValid)
         {
             team.RegisteredOn = DateTime.UtcNow;
@@ -68,12 +89,12 @@ public class TeamsController : Controller
             return RedirectToAction(nameof(Index));
         }
 
-        ViewBag.Competitions = new SelectList(
-            await _context.Competitions.Where(c => c.IsOpenForRegistration).ToListAsync(),
-            "Id",
-            "Title",
-            team.CompetitionId
-        );
+        var openCompetitions = await _context.Competitions
+            .Where(c => c.IsOpenForRegistration && c.EventDate >= DateTime.UtcNow.Date)
+            .AsNoTracking()
+            .ToListAsync();
+
+        ViewBag.CompetitionId = new SelectList(openCompetitions, "Id", "Title", team.CompetitionId);
         return View(team);
     }
 
