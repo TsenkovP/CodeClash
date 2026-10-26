@@ -48,6 +48,22 @@ public class ProjectSubmissionsController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create([Bind("ProjectTitle,GitHubUrl,Score,TeamId")] ProjectSubmission submission)
     {
+        // Проверка: Има ли вече предаден проект за този отбор
+        bool alreadySubmitted = await _context.ProjectSubmissions
+            .AnyAsync(p => p.TeamId == submission.TeamId);
+
+        if (alreadySubmitted)
+        {
+            ModelState.AddModelError("TeamId", "Избраният отбор вече има предаден проект.");
+        }
+
+        // Проверка за валиден GitHub URL формат (ако е попълнен)
+        if (!string.IsNullOrWhiteSpace(submission.GitHubUrl) && 
+            !Uri.TryCreate(submission.GitHubUrl, UriKind.Absolute, out _))
+        {
+            ModelState.AddModelError("GitHubUrl", "Моля, въведете валиден пълен URL адрес (напр. https://github.com/...).");
+        }
+
         if (ModelState.IsValid)
         {
             submission.SubmittedOn = DateTime.UtcNow;
@@ -56,7 +72,9 @@ public class ProjectSubmissionsController : Controller
             return RedirectToAction(nameof(Index));
         }
 
+        // Ако има грешка, презареждаме наличните отбори, за да не се чупи формата
         var submittedTeamIds = await _context.ProjectSubmissions
+            .Where(s => s.TeamId != submission.TeamId)
             .Select(s => s.TeamId)
             .ToListAsync();
 

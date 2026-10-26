@@ -76,9 +76,21 @@ public class TeamsController : Controller
     public async Task<IActionResult> Create([Bind("TeamName,MentorName,ContactEmail,CompetitionId,MaxTeamMembers")] Team team)
     {
         var competition = await _context.Competitions.FindAsync(team.CompetitionId);
+    
+        // Проверка 1: Съществува ли и отворено ли е състезанието
         if (competition == null || !competition.IsOpenForRegistration)
         {
             ModelState.AddModelError("CompetitionId", "Регистрацията за това състезание е затворена или не съществува.");
+        }
+
+        // Проверка 2: Уникалност на името на отбора в рамките на това състезание
+        bool teamNameExists = await _context.Teams.AnyAsync(t => 
+            t.CompetitionId == team.CompetitionId && 
+            t.TeamName.Trim().ToLower() == team.TeamName.Trim().ToLower());
+
+        if (teamNameExists)
+        {
+            ModelState.AddModelError("TeamName", $"Вече съществува отбор с име \"{team.TeamName}\" в избраното състезание.");
         }
 
         if (ModelState.IsValid)
@@ -89,6 +101,7 @@ public class TeamsController : Controller
             return RedirectToAction(nameof(Index));
         }
 
+        // При грешка зареждаме отново списъка с активни състезания
         var openCompetitions = await _context.Competitions
             .Where(c => c.IsOpenForRegistration && c.EventDate >= DateTime.UtcNow.Date)
             .AsNoTracking()
@@ -122,11 +135,22 @@ public class TeamsController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(int id, [Bind("Id,TeamName,MentorName,ContactEmail,CompetitionId,RegisteredOn")] Team team)
+    public async Task<IActionResult> Edit(int id, [Bind("Id,TeamName,MentorName,ContactEmail,CompetitionId,RegisteredOn,MaxTeamMembers")] Team team)
     {
         if (id != team.Id)
         {
             return NotFound();
+        }
+
+        // Проверка: Има ли друг отбор със същото име в същото състезание
+        bool duplicateExists = await _context.Teams.AnyAsync(t => 
+            t.Id != id &&
+            t.CompetitionId == team.CompetitionId && 
+            t.TeamName.Trim().ToLower() == team.TeamName.Trim().ToLower());
+
+        if (duplicateExists)
+        {
+            ModelState.AddModelError("TeamName", $"Вече съществува друг отбор с име \"{team.TeamName}\" в това състезание.");
         }
 
         if (ModelState.IsValid)
@@ -147,12 +171,7 @@ public class TeamsController : Controller
             return RedirectToAction(nameof(Index));
         }
 
-        ViewBag.Competitions = new SelectList(
-            await _context.Competitions.ToListAsync(),
-            "Id",
-            "Title",
-            team.CompetitionId
-        );
+        ViewBag.CompetitionId = new SelectList(_context.Competitions, "Id", "Title", team.CompetitionId);
         return View(team);
     }
 
