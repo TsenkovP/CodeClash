@@ -1,0 +1,114 @@
+@model IEnumerable<CodeClash.Models.Competition>
+
+@{
+    ViewData["Title"] = "Състезания";
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-center pb-3 mb-4 border-bottom">
+    <div>
+        <h2 class="fw-bold tracking-tight mb-1 text-dark">Състезания и олимпиади</h2>
+        <p class="text-secondary mb-0">Управление на активните и предстоящите състезателни събития</p>
+    </div>
+    <div>
+        <a asp-action="Create" class="btn btn-primary px-3 py-2 shadow-sm fw-medium">
+            + Ново състезание
+        </a>
+    </div>
+</div>
+
+<div class="row g-4">
+@if (!Model.Any())
+{
+    <div class="col-12">
+        <div class="card border-0 shadow-sm p-5 text-center text-muted rounded-4 bg-light">
+            <h5 class="fw-semibold">Все още няма въведени състезания</h5>
+            <p class="mb-3">Можете да добавите първото събитие чрез бутона горе.</p>
+            <div>
+                <a asp-action="Create" class="btn btn-outline-primary btn-sm">Създай състезание</a>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    @foreach (var comp in Model)
+    {
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden position-relative hover-shadow transition-all bg-white">
+                <div class="card-body p-4 d-flex flex-column">
+                    
+                    <!-- Горна лента: Статус -->
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="badge rounded-pill px-3 py-2 @(comp.IsOpenForRegistration ? "bg-success-subtle text-success border border-success-subtle" : "bg-secondary-subtle text-secondary border border-secondary-subtle")">
+                            @(comp.IsOpenForRegistration ? "Отворено за записване" : "Регистрацията е затворена")
+                        </span>
+                        <span class="text-muted small fw-medium">ID: #@comp.Id</span>
+                    </div>
+
+                    <!-- Заглавие и Описание -->
+                    <h5 class="card-title fw-bold text-dark mb-2">@comp.Title</h5>
+                    <p class="card-text text-secondary mb-4 flex-grow-1" style="min-height: 48px;">
+                        @(string.IsNullOrWhiteSpace(comp.Description) ? "Няма допълнително описание." : comp.Description)
+                    </p>
+
+                    <!-- Рамки за ключови параметри (Категории в отделни frames) -->
+                    <div class="row g-2 mb-4">
+                        <div class="col-6">
+                            <div class="border rounded-3 p-2 text-center bg-body-tertiary">
+                                <span class="d-block text-secondary small fw-semibold text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.5px;">Дата</span>
+                                <span class="fw-bold text-dark fs-6">@comp.EventDate.ToString("dd.MM.yyyy")</span>
+                            </div>
+                        </div>
+
+                        <div class="col-6">
+                            <div class="border rounded-3 p-2 text-center bg-body-tertiary">
+                                <span class="d-block text-secondary small fw-semibold text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.5px;">Отбори</span>
+                                <span class="fw-bold text-dark fs-6">@(comp.Teams?.Count ?? 0)</span>
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <div class="border rounded-3 py-2 px-3 d-flex justify-content-between align-items-center bg-body-tertiary">
+                                <span class="text-secondary small fw-semibold text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.5px;">Макс. състезатели в отбор</span>
+                                <span class="badge bg-white text-dark border fw-bold">до @comp.MaxTeamMembers души</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Бутони за управление -->
+                    <div class="pt-2 border-top">
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <a asp-action="Details" asp-route-id="@comp.Id" class="btn btn-outline-primary w-100 btn-sm py-2 rounded-2 fw-medium">
+                                    Детайли
+                                </a>
+                            </div>
+                            <div class="col-3">
+                                <a asp-action="Edit" asp-route-id="@comp.Id" class="btn btn-light border w-100 btn-sm py-2 rounded-2 text-secondary" title="Редакция">
+                                    Ред.
+                                </a>
+                            </div>
+                            <div class="col-3">
+                                <a asp-action="Delete" asp-route-id="@comp.Id" class="btn btn-light border border-danger-subtle text-danger w-100 btn-sm py-2 rounded-2" title="Изтриване">
+                                    Триене
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    }
+}
+</div>
+
+<style>
+    .transition-all {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .hover-shadow:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 0.75rem 1.5rem rgba(0, 0, 0, 0.08) !important;
+    }
+</style>

@@ -1,0 +1,76 @@
+@model CodeClash.Models.Competition
+
+@{
+    ViewData["Title"] = "Детайли за състезанието";
+}
+
+<div class="card shadow-sm border-0 mb-4">
+    <div class="card-body">
+        <div class="d-flex justify-content-between align-items-start">
+            <div>
+                <h2 class="fw-bold mb-1">@Model.Title</h2>
+                <span class="badge @(Model.IsOpenForRegistration ? "bg-success" : "bg-secondary") mb-3">
+                    @(Model.IsOpenForRegistration ? "Отворено за регистрация" : "Затворено")
+                </span>
+            </div>
+            <div>
+                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-sm btn-outline-secondary">Редактирай</a>
+                <a asp-action="Index" class="btn btn-sm btn-outline-dark">Назад</a>
+            </div>
+        </div>
+        <p class="lead">@Model.Description</p>
+        <div class="text-muted small">
+            <span>📅 <strong>Дата:</strong> @Model.EventDate.ToString("dd.MM.yyyy")</span> | 
+            <span>👥 <strong>Макс. състезатели в отбор:</strong> @Model.MaxTeamMembers</span>
+        </div>
+    </div>
+</div>
+
+<h4 class="fw-bold mb-3">Записани отбори (@(Model.Teams?.Count ?? 0))</h4>
+<div class="card shadow-sm border-0">
+    <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+            <tr>
+                <th>Отбор</th>
+                <th>Ръководител</th>
+                <th>Имейл за контакт</th>
+                <th>Проект</th>
+                <th>Оценка</th>
+            </tr>
+        </thead>
+        <tbody>
+        @if (Model.Teams == null || !Model.Teams.Any())
+        {
+            <tr>
+                <td colspan="5" class="text-center py-4 text-muted">
+                    Все още няма записани отбори за това състезание.
+                </td>
+            </tr>
+        }
+        else
+        {
+            @foreach (var team in Model.Teams)
+            {
+                <tr>
+                    <td class="fw-bold">@team.TeamName</td>
+                    <td>@team.MentorName</td>
+                    <td>@team.ContactEmail</td>
+                    <td>
+                        @(team.Submission?.ProjectTitle ?? "—")
+                    </td>
+                    <td>
+                        @if (team.Submission?.Score.HasValue == true)
+                        {
+                            <span class="badge bg-success">@team.Submission.Score т.</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-light text-muted border">Няма</span>
+                        }
+                    </td>
+                </tr>
+            }
+        }
+        </tbody>
+    </table>
+</div>
