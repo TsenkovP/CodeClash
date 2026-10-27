@@ -15,20 +15,40 @@
         </a>
     </div>
 </div>
-
+<form asp-action="Index" method="get" class="mb-4">
+    <div class="input-group">
+        <input type="text" name="searchTerm" value="@ViewData["CurrentFilter"]" class="form-control rounded-start-3" placeholder="Търсене на състезание по заглавие или описание..." />
+        <button class="btn btn-outline-primary px-4" type="submit">Търси</button>
+        @if (!string.IsNullOrWhiteSpace(ViewData["CurrentFilter"] as string))
+        {
+            <a asp-action="Index" class="btn btn-outline-secondary px-3">Изчисти</a>
+        }
+    </div>
+</form>
 <div class="row g-4">
-@if (!Model.Any())
-{
-    <div class="col-12">
-        <div class="card border-0 shadow-sm p-5 text-center text-muted rounded-4 bg-light">
-            <h5 class="fw-semibold">Все още няма въведени състезания</h5>
-            <p class="mb-3">Можете да добавите първото събитие чрез бутона горе.</p>
-            <div>
-                <a asp-action="Create" class="btn btn-outline-primary btn-sm">Създай състезание</a>
+    @if (!Model.Any())
+    {
+        <div class="col-12">
+            <div class="card border-0 shadow-sm p-5 text-center text-muted rounded-4 bg-light">
+                @if (!string.IsNullOrWhiteSpace(ViewData["CurrentFilter"] as string))
+                {
+                    <h5 class="fw-semibold text-dark">Няма намерени състезания по зададения критерий</h5>
+                    <p class="mb-3">Няма съвпадения за "<strong>@ViewData["CurrentFilter"]</strong>".</p>
+                    <div>
+                        <a asp-action="Index" class="btn btn-outline-secondary btn-sm">Покажи всички състезания</a>
+                    </div>
+                }
+                else
+                {
+                    <h5 class="fw-semibold">Все още няма въведени състезания</h5>
+                    <p class="mb-3">Можете да добавите първото събитие чрез бутона горе.</p>
+                    <div>
+                        <a asp-action="Create" class="btn btn-outline-primary btn-sm">Създай състезание</a>
+                    </div>
+                }
             </div>
         </div>
-    </div>
-}
+    }
 else
 {
     @foreach (var comp in Model)

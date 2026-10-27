@@ -14,14 +14,20 @@ public class CompetitionsController : Controller
         _context = context;
     }
 
-    public async Task<IActionResult> Index()
+    // GET: Competitions
+    public async Task<IActionResult> Index(string? searchTerm)
     {
-        var competitions = await _context.Competitions
-            .Include(c => c.Teams)
-            .AsNoTracking()
-            .OrderByDescending(c => c.EventDate)
-            .ToListAsync();
+        var query = _context.Competitions.Include(c => c.Teams).AsQueryable();
 
+        if (!string.IsNullOrWhiteSpace(searchTerm))
+        {
+            query = query.Where(c => c.Title.Contains(searchTerm) || 
+                                     (c.Description != null && c.Description.Contains(searchTerm)));
+        }
+
+        ViewData["CurrentFilter"] = searchTerm;
+
+        var competitions = await query.OrderBy(c => c.EventDate).ToListAsync();
         return View(competitions);
     }
 

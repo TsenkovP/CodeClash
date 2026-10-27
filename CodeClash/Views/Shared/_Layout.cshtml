@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true"/>
     <link rel="stylesheet" href="~/CodeClash.styles.css" asp-append-version="true"/>
 </head>
-<body>
+<body class="d-flex flex-column min-vh-100">
 <header>
     <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
         <div class="container-fluid">
@@ -36,17 +36,59 @@
         </div>
     </nav>
 </header>
-<div class="container">
+<div class="container flex-grow-1 mb-5">
     <main role="main" class="pb-3">
         @RenderBody()
     </main>
 </div>
 
-<footer class="border-top footer text-muted">
-    <div class="container">
-        &copy; 2026 - CodeClash - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-    </div>
-</footer>
+<footer class="mt-auto border-top bg-white py-4 shadow-sm">
+        <div class="container">
+            <div class="row align-items-center gy-3">
+                <!-- Лява колона: Бранд и описание -->
+                <div class="col-md-5 text-center text-md-start">
+                    <div class="d-flex align-items-center justify-content-center justify-content-md-start gap-2 mb-1">
+                        <span class="badge bg-primary px-2 py-1 fw-bold rounded-2">#CC</span>
+                        <span class="fw-bold text-dark fs-5 tracking-tight">CodeClash</span>
+                    </div>
+                    <p class="text-secondary small mb-0">
+                        Платформа за състезания по програмиране, хакатони и оценяване на проекти в реално време.
+                    </p>
+                </div>
+
+                <!-- Средна колона: Бързи връзки -->
+                <div class="col-md-4 text-center">
+                    <div class="d-flex justify-content-center gap-3 small">
+                        <a asp-controller="Home" asp-action="Index" class="text-decoration-none text-secondary hover-primary">Начало</a>
+                        <span class="text-muted">•</span>
+                        <a asp-controller="Competitions" asp-action="Index" class="text-decoration-none text-secondary hover-primary">Състезания</a>
+                        <span class="text-muted">•</span>
+                        <a asp-controller="Teams" asp-action="Index" class="text-decoration-none text-secondary hover-primary">Отбори</a>
+                        <span class="text-muted">•</span>
+                        <a asp-controller="Leaderboard" asp-action="Index" class="text-decoration-none text-secondary hover-primary">Класиране</a>
+                    </div>
+                </div>
+
+                <!-- Дясна колона: Версия и авторски права -->
+                <div class="col-md-3 text-center text-md-end">
+                    <span class="badge bg-light text-secondary border rounded-pill px-3 py-1 small fw-normal mb-1">
+                        ASP.NET Core 9.0
+                    </span>
+                    <div class="text-muted small">
+                        &copy; @DateTime.UtcNow.Year CodeClash. Всички права запазени.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+<style>
+.hover-primary {
+transition: color 0.2s ease;
+}
+.hover-primary:hover {
+color: var(--bs-primary) !important;
+}
+</style>
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 <script src="~/js/site.js" asp-append-version="true"></script>
