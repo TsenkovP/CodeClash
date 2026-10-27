@@ -1,0 +1,19 @@
+@{
+    ViewData["Title"] = "Ресурсът не е намерен";
+}
+
+<div class="container text-center py-5 my-5">
+    <div class="display-1 text-primary fw-bold mb-3">404</div>
+    <h2 class="fw-bold text-dark mb-3">Търсената страница или запис не съществува</h2>
+    <p class="text-secondary fs-5 mb-4">
+        Възможно е състезанието, отборът или проектът да са премахнати или адресът да е въведен некоректно.
+    </p>
+    <div class="d-flex justify-content-center gap-3">
+        <a asp-controller="Home" asp-action="Index" class="btn btn-primary px-4 py-2 rounded-3">
+            Към началната страница
+        </a>
+        <a asp-controller="Competitions" asp-action="Index" class="btn btn-outline-secondary px-4 py-2 rounded-3">
+            Преглед на състезанията
+        </a>
+    </div>
+</div>
